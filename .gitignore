@@ -30,3 +30,4 @@ _ReSharper*/
 data/*
 doc/*
 zip/*
+*.mat
