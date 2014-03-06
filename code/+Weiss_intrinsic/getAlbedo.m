@@ -13,9 +13,9 @@ dx=median(dxs,3);
 dy=median(dys,3);
 
 if ~exist('invKhat')
-  [imR,invKhat]=reconsEdge3(dx,dy);
+  [imR,invKhat]=Weiss_intrinsic.reconsEdge3(dx,dy);
  % [imR]=reconsEdge2(dx,dy);
 else
-  imR=reconsEdge3(dx,dy,invKhat);
+  imR=Weiss_intrinsic.reconsEdge3(dx,dy,invKhat);
 end
 

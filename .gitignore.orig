@@ -1,7 +1,4 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
+<<<<<<< HEAD
 
 #ignore thumbnails created by windows
 Thumbs.db
@@ -35,3 +32,18 @@ data/*
 doc/*
 zip/*
 *.mat
+=======
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+>>>>>>> 756a8b933a4918b499979f1e69868dd8c7a56e78

@@ -8,7 +8,7 @@ im=zeros(size(dx));
 mxsize=max(sx,sy);
 
 if ~exist('invKhat')
-  invK=invDel2(2*mxsize);
+  invK=Weiss_intrinsic.invDel2(2*mxsize);
   invKhat=fft2(invK);
 end
 

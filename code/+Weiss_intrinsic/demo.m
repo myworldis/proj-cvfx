@@ -15,7 +15,7 @@ for i=-fnum:fnum
     im1=im1+circIm;
     bigIm1(:,:,i+fnum+1)=im1;
     
-    imwrite(im1,strcat(tempDir,'_',num2str(i),'_.jpg'));
+    %imwrite(im1,strcat(tempDir,'_',num2str(i),'_.jpg'));
     
 end
 
