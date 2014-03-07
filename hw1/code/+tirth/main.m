@@ -6,13 +6,18 @@ warrn_id = 'images:initSize:adjustingMag';
 warning('off',warrn_id)
 
 %%
+
+bkMask = imread('../bk_mask.png');
+bkMask = bkMask(:,:,1) ==0;
+
+%%
 ROOT = '../data';
 
 f1='IMG_0549.MOV';
 f2='IMG_0550.MOV';
 f3='IMG_0562.MOV';
 
-v1=VideoReader(fullfile(ROOT,f3) );
+v1=VideoReader(fullfile(ROOT,f1) );
 
 num = v1.NumberOfFrames;
 
@@ -38,7 +43,9 @@ end
 %% pick frames 2
 
 sid2 = [6,111,311,381,781,551,526,776,1356];
-sid2 = [6:8,111:113,311:312,381:383,781:783,551:553,526:528,776:778,1356:1358];
+%sid2 = [6:8,111:113,311:312,381:383,781:783,551:553,526:528,776:778,1356:1358];
+
+sid2 = [196,1406,311];
 
 ratio = 0.25;
 
@@ -51,12 +58,17 @@ for k=1:numel(sid2)
     ms_f(:,:,:, end+1) = gim ; 
 end
  
+disp('load done');
+
+%%
+
+imwrite( ms_f(:,:,:,1)  , '../bk.png');
 
 %% vis
 figure;
 
-for k=1:size(ds_f,4)
-    imshow(ds_f(:,:,:,k));
+for k=1:size(ms_f,4)
+    imshow(ms_f(:,:,:,k));
     title(num2str(k));
     pause 
 end
@@ -75,9 +87,23 @@ end
 
 %% RUN
 
-
 [rimg , limg , gimref , giml1 ]=tirth.rgbWeiss(ms_f);
- 
+
+%%
+
+rimg_1d = reshape(tirth.normalize(rimg),[],3);
+ori_1d = reshape(ms_f(:,:,:,1) , [],3);
+rimg_1d(bkMask,:)=ori_1d(bkMask, : );
+
+rimg2 = reshape( rimg_1d , size(rimg) );
+fimshow(rimg2);
+
+
+%% 
+
+figure;
+show(tirth.normalize(rimg));
+
 %% VIS result
 fimshow(tirth.normalize(rimg));
 title('reflectance');
@@ -113,7 +139,7 @@ rimg2=reshape(rimg2,size(rimg));
 
 fimshowpair(tirth.normalize(rimg),tirth.normalize(rimg2));
 
-
+%%
 comp=exp(log(rimg2)+log(limg));
 comp2=real(comp); 
 comp2(comp2<0)=0;

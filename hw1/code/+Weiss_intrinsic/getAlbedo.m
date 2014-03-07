@@ -12,6 +12,7 @@ end
 dx=median(dxs,3);
 dy=median(dys,3);
 
+%%
 if ~exist('invKhat')
   [imR,invKhat]=Weiss_intrinsic.reconsEdge3(dx,dy);
  % [imR]=reconsEdge2(dx,dy);

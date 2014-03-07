@@ -29,17 +29,16 @@ ts = tic;
 toc(ts)
 
 %% gray version
-% 
-% gims = zeros(size(rgbframes,1),size(rgbframes,2),0);
-% for k=1:size(rgbframes,4)
-%     gim = rgb2gray(rgbframes(:,:,:,k));
-%     gims(:,:,end+1)=gim;
-% end
-% 
-% 
-% [gimref , giml1 ]=calc(gims);
 
-gimref=[];giml1=[];
+gims = zeros(size(rgbframes,1),size(rgbframes,2),0);
+for k=1:size(rgbframes,4)
+    gim = rgb2gray(rgbframes(:,:,:,k));
+    gims(:,:,end+1)=gim;
+end
+
+
+[gimref , giml1 ]=calc(gims);
+
 end
 
 

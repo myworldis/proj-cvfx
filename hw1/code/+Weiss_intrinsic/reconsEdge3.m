@@ -4,7 +4,7 @@ function [im,invKhat]=reconsEdge3(dx,dy,invKhat)
 
 
 im=zeros(size(dx));
-[sx,sy]=size(dx);
+[sx,sy]=size(dx);   
 mxsize=max(sx,sy);
 
 if ~exist('invKhat')

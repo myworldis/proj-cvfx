@@ -27,10 +27,11 @@ bigIm1=bigIm1+1;
 
 % for boundary conditions we assume the boundary of the image
 % is set to zero
-bigIm1=zeroB(bigIm1,2);
+bigIm1=Weiss_intrinsic.zeroB(bigIm1,2);
  
-[imR,dxs,dys,dx,dy,invKhat]=getAlbedo(bigIm1);
+[imR,dxs,dys,dx,dy,invKhat]=Weiss_intrinsic.getAlbedo(bigIm1);
  
+%%
 %figure(1);
 %show(bigIm1(:,:,1));
 %title('frame 1');
@@ -40,8 +41,9 @@ title('reflectance');
 % to get lighting we subtract median lighting from the gradient
 % and reconstruct
 
+%%
 figure(3);
-light1=reconsEdge3(dxs(:,:,1)-dx,dys(:,:,1)-dy,invKhat);
+light1=Weiss_intrinsic.reconsEdge3(dxs(:,:,1)-dx,dys(:,:,1)-dy,invKhat);
 show(light1);
 title('lighting frame 1');
 
