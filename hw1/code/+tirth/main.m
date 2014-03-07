@@ -120,6 +120,22 @@ fimshowpair(ms_f(:,:,:,1), tirth.normalize(comp2) );
 
 title('re-comstruct');
 
+%%
+
+preFImg = comp2;
+
+
+tmp_1d = reshape(preFImg,[],3);
+ori_1d = reshape(ms_f(:,:,:,1) , [],3);
+tmp_1d(bkMask,:)=ori_1d(bkMask, : );
+
+fimg = reshape( tmp_1d , size(rimg) );
+fimshow(fimg);
+
+
+
+
+
 %% getstroke
 
 strokeMask = tirth.getDraw(ms_f(:,:,:,1));
