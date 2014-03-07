@@ -109,16 +109,44 @@ title('light of frame 1');
 
 %%
 
-comp=exp(log(rimg+1)+log(limg+1));
+comp=exp(log(rimg)+log(limg));
 comp2=real(comp); 
 comp2(comp2<0)=0;
 fimshowpair(ms_f(:,:,:,1), tirth.normalize(comp2) );
 
 title('re-comstruct');
 
-%% composition
+%% getstroke
 
 strokeMask = tirth.getDraw(ms_f(:,:,:,1));
- 
+
+%% composition
+
+bkpixel = rimg(213,205,:);
+
+rimg2=rimg;
+rimg2=reshape(rimg2,[],3);
+
+rimg2(strokeMask,1)=bkpixel(1);
+rimg2(strokeMask,2)=bkpixel(2);
+rimg2(strokeMask,3)=bkpixel(3);
+
+rimg2=reshape(rimg2,size(rimg));
+
+fimshowpair(tirth.normalize(rimg),tirth.normalize(rimg2));
+
+
+comp=exp(log(rimg2)+log(limg));
+comp2=real(comp); 
+comp2(comp2<0)=0;
+fimshowpair(ms_f(:,:,:,1), tirth.normalize(comp2) );
+
+title('re-compose');
+
+
+
+
+
+
 
 
