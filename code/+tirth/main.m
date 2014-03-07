@@ -101,6 +101,7 @@ end
 
 [rimg , limg , gimref , giml1 ]=tirth.rgbWeiss(ms_f);
  
+%%
 fimshow(tirth.normalize(rimg));
 title('reflectance');
 
