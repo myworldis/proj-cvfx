@@ -22,7 +22,7 @@ frames=zeros(v1.Height,v1.Width,3,0,'uint8');
 for k=1:30:num
     frames(:,:,:,end+1) =uint8(read(v1, k));
 end
-%% save frame
+%% save frame 
 
 caseName = 'case3';
 saveDir = fullfile('../tmp',caseName);
@@ -108,46 +108,17 @@ fimshow(tirth.normalize(limg));
 title('light of frame 1');
 
 %%
-fimshow(gimref);
-fimshow(giml1);
 
-%%
+comp=exp(log(rimg+1)+log(limg+1));
+comp2=real(comp); 
+comp2(comp2<0)=0;
+fimshowpair(ms_f(:,:,:,1), tirth.normalize(comp2) );
+
+title('re-comstruct');
+
+%% composition
+
+strokeMask = tirth.getDraw(ms_f(:,:,:,1));
  
-ts = tic;
-
-[imR,dxs,dys,dx,dy,invKhat]=getAlbedo(ds_f);
-fimshow(imR);
-
-disp('albedo DONE');
-
-light1=reconsEdge3(dxs(:,:,1)-dx,dys(:,:,1)-dy,invKhat);
-
-disp('light DONE');
-
-toc(ts)
-
-
-%%
-
-figure(2);
-show(imR);
-title('reflectance');
-
-% to get lighting we subtract median lighting from the gradient
-% and reconstruct
-
-figure(3);
-show(light1);
-title('lighting frame 1');
-
-
-
-
-
-
-
-
-
-
 
 
