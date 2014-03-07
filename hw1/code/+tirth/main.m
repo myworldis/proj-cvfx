@@ -87,7 +87,7 @@ end
 
 %% RUN
 
-[rimg , limg , gimref , giml1 ]=tirth.rgbWeiss(ms_f);
+[rimg , limg , gimref , giml1 ]=tirth.rgbWeiss(msFr);
 
 %%
 
