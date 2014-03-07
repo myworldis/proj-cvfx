@@ -38,3 +38,8 @@ zip/*
 tmp/case1/*
 tmp/case3/*
 *.asv
+hw1/data/*.MOV
+hw1/data/__MACOSX/*
+hw1/tmp/*
+hw1/doc/*
+hw1/zip/*

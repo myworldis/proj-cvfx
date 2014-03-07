@@ -35,7 +35,7 @@ for k=1:5:num
     fprintf('pass -%d/%d \n',k,num);
 end
 
-%% picl frames 2
+%% pick frames 2
 
 sid2 = [6,111,311,381,781,551,526,776,1356];
 sid2 = [6:8,111:113,311:312,381:383,781:783,551:553,526:528,776:778,1356:1358];
@@ -50,30 +50,7 @@ for k=1:numel(sid2)
     gim = ( double(imresize(aframe,ratio))./255 );
     ms_f(:,:,:, end+1) = gim ; 
 end
-
-
-%% pick frames
-
-ratio = 0.25;
-
-ds_f = zeros(size(frames,1)*ratio ,  size(frames,2)*ratio , 3 , 0);
-ds_idx = [];
-
-for k=1:5:size(frames,4)  
-    gim = ( double(imresize(frames(:,:,:,k),ratio))./255 );
-    ds_f(:,:,:, end+1) = gim ;
-    ds_idx(end+1)=k;
-end
-%% save
  
-figure;
-
-for k=1:size(frames,4)
-    %imshow(frames(:,:,:,k));
-    %title(strcat('frame-',num2str(k)));
-    %pause
-    imwrite(frames(:,:,:,k),strcat('../tmp/frame-',num2str(k),'.png'));
-end
 
 %% vis
 figure;
@@ -96,19 +73,19 @@ for k=1:numel(sid)
     msFr(:,:,:,end+1)= imresize(af , ratio);
 end
 
-%%
+%% RUN
 
 
 [rimg , limg , gimref , giml1 ]=tirth.rgbWeiss(ms_f);
  
-%%
+%% VIS result
 fimshow(tirth.normalize(rimg));
 title('reflectance');
 
 fimshow(tirth.normalize(limg));
 title('light of frame 1');
 
-%%
+%% reconstruct
 
 comp=exp(log(rimg)+log(limg));
 comp2=real(comp); 
