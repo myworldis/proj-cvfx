@@ -31,6 +31,10 @@ toc(ts)
 %% gray version
 
 
+for k=1:size(rgbframes,4)
+    gim = rgb2gray(rgbframes(:,:,:,k));
+end
+
 
 
 end

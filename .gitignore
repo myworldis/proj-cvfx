@@ -35,3 +35,6 @@ data/*
 doc/*
 zip/*
 *.mat
+tmp/case1/*
+tmp/case3/*
+*.asv
