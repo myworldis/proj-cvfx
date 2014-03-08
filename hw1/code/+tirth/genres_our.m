@@ -39,22 +39,7 @@ for k=1:size(fSample,4)
     imshow(fSample(:,:,:,k));
     pause;
 end
-
-%%
-
-ratio = 0.35;
-
-smImgs=zeros(size(imgs{1},1)*ratio,size(imgs{2},2)*ratio,3,0);
-
-for k=1:numel(imgs)
-    
-    aim = ( double(imresize(imgs{k},ratio))./255 );
-    smImgs(:,:,:,end+1)=aim;
-end
-
-disp('done');
- 
- 
+  
 %% RUN
  
 targetImgs = fSample;
@@ -70,8 +55,7 @@ title('light of frame 1');
  
 
 %% save
-
-imwrite(rimg, '../data/rimg_our_ori.png');
+imwrite(rimg, '../data/rimg_our_1080p.png');
   
 %%
 % log domain
@@ -90,9 +74,13 @@ fimshow( (comp2_rmb) );
 
 %% composed 
 
-rimg_ret=imread('../data/rimg_our4.png');
-rimg_ret = double(rimg_ret)./255;
-comp=rimg_ret+limg;
+retouchRimg=imread('../data/rimg_our_rt_1080p.png');
+retouchRimg = double(retouchRimg)./255;
+
+
+retouchRimg2=imresize(retouchRimg,ratio);
+
+comp=retouchRimg2+limg;
 
 fimshowpair(targetImgs(:,:,:,1), (comp) );
 title('recompose');
@@ -100,18 +88,23 @@ title('recompose');
 %% 
  
 vinFname = '../data/new2/DSCN1213.MOV';
-voutFname ='../res/our_comp.MOV';
+voutFname ='../res/our_comp_final.MOV';
 
 vin=VideoReader( vinFname); 
 vout=VideoWriter( voutFname, 'Uncompressed AVI' ); 
 
-tirth.reconstrAll(vout,vin, rimg_ret ,calData , 0.25 );
+open(vout); 
+tirth.reconstrAll(vout,vin, retouchRimg2 ,calData , 0.5 );
+ 
+close(vout);
 
-fclose(vin);
-fclose(vout);
+%% save light of frame 1 and ref
 
+imwrite(tirth.clamp(rimg,1,0),'../res/our_ref.png');
+imwrite(tirth.clamp(limg,1,0),'../res/our_ligf1.png');
 
+imwrite(tirth.normalize(real(exp(rimg))),'../res/our_ref_n.png');
+imwrite(tirth.normalize(real(exp(limg))),'../res/our_ligf1_n.png');
 
-
-
+disp('sav done');
 

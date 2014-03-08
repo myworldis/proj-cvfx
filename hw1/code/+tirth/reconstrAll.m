@@ -16,7 +16,7 @@ vWidth = vinObj.Width;
 vHeight = vinObj.Height;
  
  
-for k=100:100+100 %numel(numF)
+for k=1:numF
  
     af =double(read(vinObj, k))./255; 
     af = imresize(af,ratio);

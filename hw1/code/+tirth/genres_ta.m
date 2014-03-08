@@ -39,7 +39,7 @@ sid2 = [6,111,311,381,781,551,526,776,1356];
 
 sid2 = [196,1406,311];
 
-ratio = 0.5;
+ratio = 1;
 
 ms_f = zeros( vHeight*ratio ,  vWidth*ratio , 3 , 0);
  
@@ -107,7 +107,7 @@ title('re-compose');
 ratio=0.5;
 
 vinFname = '../data/IMG_0549.MOV';
-voutFname ='../res/ta_comp_2y.avi';
+voutFname ='../res/ta_comp_2_final.avi';
 
 retouchRimg = double(imread('../data/rimgta_rt_1080p.png'))./255;
 
@@ -119,11 +119,20 @@ retouchRimg=imresize(retouchRimg,ratio);
 
 open(vout);
 tirth.reconstrAll(vout,vin, retouchRimg ,calData , ratio );
- 
+
 close(vout);
 
-disp('close vout');
+disp('DONE-close vout');
 
+%%
+
+ 
+imwrite(tirth.clamp(rimg,1,0),'../res/ta_ref.png');
+imwrite(tirth.clamp(limg,1,0),'../res/ta_ligf1.png');
+imwrite(tirth.normalize(rimg),'../res/ta_ref_n.png');
+imwrite(tirth.normalize(limg),'../res/ta_ligf1_n.png');
+
+disp('sav done');
 
 
 
