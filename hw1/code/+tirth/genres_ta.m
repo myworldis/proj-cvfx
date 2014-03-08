@@ -73,7 +73,7 @@ end
 
 fprintf('# of frames = %d \n', size(targetF2,4));
 
-[rimg , limg , gimref , giml1 ]=tirth.rgbWeiss(targetF2);
+[rimg , limg ]=tirth.rgbWeiss(targetF2);
  
 
 %% VIS result

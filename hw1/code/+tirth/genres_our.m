@@ -27,7 +27,7 @@ disp('load done');
 
 %%
 
-ratio = 0.25;
+ratio = 0.35;
 
 smImgs=zeros(size(imgs{1},1)*ratio,size(imgs{2},2)*ratio,3,0);
 
@@ -50,11 +50,15 @@ end
 %%
 
 targetImgs_2 = smImgs;
+targetImgs_zb=Weiss_intrinsic.zeroB(targetImgs_2,2);
 
 %%
 
-targetImgs_zb=Weiss_intrinsic.zeroB(targetImgs_2,2);
-[rimg , limg , gimref , giml1 ]=tirth.rgbWeiss(targetImgs_zb);
+
+fprintf('# of frames = %d \n', size(targetImgs_2,4));
+
+
+[rimg , limg  ]=tirth.rgbWeiss(targetImgs_zb);
 
 %%
 fimshow(tirth.normalize(rimg));
@@ -62,21 +66,12 @@ title('reflectance');
 
 fimshow(tirth.normalize(limg));
 title('light of frame 1');
+ 
 
-%%
-fimshow(tirth.normalize(gimref));
-title('reflectance');
+%% save
 
-fimshow(tirth.normalize(giml1));
-title('reflectance');
-
-%%
-
-imwrite(rimg, 'rimg.png');
-
-%%
-
-
+imwrite(rimg, '../data/rimg_our.png');
+  
 %%
 % log domain
 comp=rimg+limg;
@@ -89,21 +84,19 @@ fimshow(comp);
 title('re-comstruct');
 
 %% remove border
-
-
 comp2_rmb = comp(3:end-2,3:end-2,:); 
 fimshow( (comp2_rmb) );
 
 %% composed 
 
-rimg_ret=imread('../data/rimg.png');
+rimg_ret=imread('../data/rimg_our4.png');
 rimg_ret = double(rimg_ret)./255;
 comp=rimg_ret+limg;
 
-fimshowpair(targetImgs(:,:,:,1), (comp) );
+fimshowpair(targetImgs_zb(:,:,:,1), (comp) );
+title('recompose');
 
-
-
+%% 
 
 
 

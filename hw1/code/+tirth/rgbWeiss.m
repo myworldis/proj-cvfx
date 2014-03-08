@@ -1,4 +1,4 @@
-function [ refImg , lightImg , gimref , giml1 ] = rgbWeiss( rgbframes )
+function [ refImg , lightImg  ] = rgbWeiss( rgbframes )
 
 
 if nargin < 1 || ndims(rgbframes) ~=4 || size(rgbframes,3)~=3
@@ -22,10 +22,16 @@ b_frs = squeeze(rgbframes(:,:,3,:));
 refImg=zeros(size(rgbframes,1),size(rgbframes,2),3);
 lightImg=zeros(size(rgbframes,1),size(rgbframes,2),3);
 
+
+calData = struct;
+calData.khat={};
+calData.dx={};
+calData.dy={};
+
 ts = tic;
-[refImg(:,:,1),lightImg(:,:,1)]=calc(r_frs);
-[refImg(:,:,2),lightImg(:,:,2)]=calc(g_frs);
-[refImg(:,:,3),lightImg(:,:,3)]=calc(b_frs);
+[refImg(:,:,1),lightImg(:,:,1),invKhat,dx,dy]=calc(r_frs);
+[refImg(:,:,2),lightImg(:,:,2),invKhat,dx,dy]=calc(g_frs);
+[refImg(:,:,3),lightImg(:,:,3),invKhat,dx,dy]=calc(b_frs);
 toc(ts)
 
 %% gray version
@@ -43,7 +49,7 @@ giml1=[];
 end
 
 
-function [imR,light1 ]=calc(frames)
+function [imR,light1,invKhat,dx,dy]=calc(frames)
 
 
 [imR,dxs,dys,dx,dy,invKhat]=Weiss_intrinsic.getAlbedo(frames);
