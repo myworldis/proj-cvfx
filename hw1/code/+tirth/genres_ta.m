@@ -39,7 +39,7 @@ sid2 = [6,111,311,381,781,551,526,776,1356];
 
 sid2 = [196,1406,311];
 
-ratio = 0.25;
+ratio = 0.5;
 
 ms_f = zeros( vHeight*ratio ,  vWidth*ratio , 3 , 0);
  
@@ -54,10 +54,8 @@ disp('load done');
  
 % borader handle
 
-targetFrames = ms_f;
-targetF2 = Weiss_intrinsic.zeroB(targetFrames);
-
-disp('borader done');
+targetF2 = ms_f;%Weiss_intrinsic.zeroB(targetFrames);
+ 
  
 
 %% vis
@@ -73,7 +71,7 @@ end
 
 fprintf('# of frames = %d \n', size(targetF2,4));
 
-[rimg , limg ]=tirth.rgbWeiss(targetF2);
+[rimg , limg , calData ]=tirth.rgbWeiss(targetF2);
  
 
 %% VIS result
@@ -92,18 +90,39 @@ title('re-comstruct');
   
 %% composition 
 
-imwrite(rimg,'../data/rimgta_ori.png');
+imwrite(rimg,'../data/rimgta_ori_1080p.png');
 
 
 %%
 
-rimg2=imread('../data/rimg_ta.png');
+rimg2=imread('../data/rimgta_rt_1080p.png');
 rimg2=double(rimg2)./255;
 comp=rimg2+limg;
 fimshowpair(ms_f(:,:,:,1), comp );
 
 title('re-compose');
 
+%% 
+ 
+ratio=0.5;
+
+vinFname = '../data/IMG_0549.MOV';
+voutFname ='../res/ta_comp_2y.avi';
+
+retouchRimg = double(imread('../data/rimgta_rt_1080p.png'))./255;
+
+vin=VideoReader( vinFname); 
+vout=VideoWriter( voutFname, 'Uncompressed AVI' ); 
+
+retouchRimg=imresize(retouchRimg,ratio);
+
+
+open(vout);
+tirth.reconstrAll(vout,vin, retouchRimg ,calData , ratio );
+ 
+close(vout);
+
+disp('close vout');
 
 
 
