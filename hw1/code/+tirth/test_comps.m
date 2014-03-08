@@ -27,7 +27,7 @@ disp('load done');
 
 %%
 
-ratio = 0.1;
+ratio = 0.25;
 
 smImgs=zeros(size(imgs{1},1)*ratio,size(imgs{2},2)*ratio,3,0);
 
@@ -38,22 +38,7 @@ for k=1:numel(imgs)
 end
 
 disp('done');
-
-%% crop imgs 
-s1=[102,20];
-s2=[380,199];
-
-crect = [s1,s2-s1];
-
-csmImgs=zeros(crect(4)+1,crect(3)+1,3,0);
-
-for k=1:numel(imgs)
-    aim = ( double(imresize(imgs{k},ratio))./255 );
-    caim = imcrop(aim, crect);
-    csmImgs(:,:,:,end+1)=caim;
-end
-
-disp('done');
+ 
 
 %% vis 
 figure
