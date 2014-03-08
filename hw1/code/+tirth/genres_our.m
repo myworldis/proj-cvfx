@@ -50,15 +50,13 @@ end
 %%
 
 targetImgs_2 = smImgs;
-targetImgs_zb=Weiss_intrinsic.zeroB(targetImgs_2,2);
 
 %%
 
 
 fprintf('# of frames = %d \n', size(targetImgs_2,4));
-
-
-[rimg , limg  ]=tirth.rgbWeiss(targetImgs_zb);
+ 
+[rimg , limg ,calData]=tirth.rgbWeiss(targetImgs_2);
 
 %%
 fimshow(tirth.normalize(rimg));
@@ -97,10 +95,18 @@ fimshowpair(targetImgs_zb(:,:,:,1), (comp) );
 title('recompose');
 
 %% 
+ 
+vinFname = '../data/new2/DSCN1213.MOV';
+voutFname ='../res/our_comp.MOV';
+
+vin=VideoReader( vinFname); 
+vout=VideoWriter( voutFname, 'Uncompressed AVI' );
 
 
+tirth.reconstrAll(vout,vin, rimg_ret ,calData , 0.35 );
 
-
+fclose(vin);
+fclose(vout);
 
 
 
