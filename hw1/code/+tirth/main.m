@@ -4,11 +4,7 @@ addpath('./Weiss_intrinsic/');
  
 warrn_id = 'images:initSize:adjustingMag';
 warning('off',warrn_id)
-
-%%
-
-bkMask = imread('../bk_mask.png');
-bkMask = bkMask(:,:,1) ==0;
+ 
 
 %%
 ROOT = '../data';
@@ -20,15 +16,9 @@ f3='IMG_0562.MOV';
 v1=VideoReader(fullfile(ROOT,f1) );
 
 num = v1.NumberOfFrames;
-
-VideoWriter
-
-%% load some data
-
-frames=zeros(v1.Height,v1.Width,3,0,'uint8');
-for k=1:30:num
-    frames(:,:,:,end+1) =uint8(read(v1, k));
-end
+vWidth = v1.Width;
+vHeight = v1.Height;
+ 
 %% save frame 
 
 caseName = 'case3';
@@ -44,14 +34,14 @@ end
 
 %% pick frames 2
 
-sid2 = [6,111,311,381,781,551,526,776,1356];
 %sid2 = [6:8,111:113,311:312,381:383,781:783,551:553,526:528,776:778,1356:1358];
+sid2 = [6,111,311,381,781,551,526,776,1356];
 
 sid2 = [196,1406,311];
 
 ratio = 0.25;
 
-ms_f = zeros(size(frames,1)*ratio ,  size(frames,2)*ratio , 3 , 0);
+ms_f = zeros( vHeight*ratio ,  vWidth*ratio , 3 , 0);
  
 
 for k=1:numel(sid2) 
@@ -61,10 +51,14 @@ for k=1:numel(sid2)
 end
  
 disp('load done');
+ 
+% borader handle
 
-%%
+targetFrames = ms_f;
+targetF2 = Weiss_intrinsic.zeroB(targetFrames);
 
-imwrite( ms_f(:,:,:,1)  , '../bk.png');
+disp('borader done');
+ 
 
 %% vis
 figure;
@@ -74,94 +68,39 @@ for k=1:size(ms_f,4)
     title(num2str(k));
     pause 
 end
-
-%% manually select
-
-sid = [1,20,29,43,10,37];
-
-msFr =zeros(size(frames,1)*ratio ,  size(frames,2)*ratio , 3 , 0);
-
-for k=1:numel(sid)
-    af = frames(:,:,:,sid(k));
-    af = double(af)./255;
-    msFr(:,:,:,end+1)= imresize(af , ratio);
-end
-
+ 
 %% RUN
 
-[rimg , limg , gimref , giml1 ]=tirth.rgbWeiss(msFr);
+fprintf('# of frames = %d \n', size(targetF2,4));
 
-%%
-
-rimg_1d = reshape(tirth.normalize(rimg),[],3);
-ori_1d = reshape(ms_f(:,:,:,1) , [],3);
-rimg_1d(bkMask,:)=ori_1d(bkMask, : );
-
-rimg2 = reshape( rimg_1d , size(rimg) );
-fimshow(rimg2);
-
-
-%% 
-
-figure;
-show(tirth.normalize(rimg));
+[rimg , limg , gimref , giml1 ]=tirth.rgbWeiss(targetF2);
+ 
 
 %% VIS result
-fimshow(tirth.normalize(rimg));
+fimshow(rimg,'border','tight');
 title('reflectance');
 
-fimshow(tirth.normalize(limg));
+fimshow(limg,'border','tight');
 title('light of frame 1');
 
 %% reconstruct
 
-comp=exp(log(rimg)+log(limg));
-comp2=real(comp); 
-comp2(comp2<0)=0;
-fimshowpair(ms_f(:,:,:,1), tirth.normalize(comp2) );
+comp=rimg+limg;
+fimshowpair(ms_f(:,:,:,1), comp );
 
 title('re-comstruct');
+  
+%% composition 
+
+imwrite(rimg,'../data/rimgta_ori.png');
+
 
 %%
 
-preFImg = comp2;
-
-
-tmp_1d = reshape(preFImg,[],3);
-ori_1d = reshape(ms_f(:,:,:,1) , [],3);
-tmp_1d(bkMask,:)=ori_1d(bkMask, : );
-
-fimg = reshape( tmp_1d , size(rimg) );
-fimshow(fimg);
-
-
-
-
-
-%% getstroke
-
-strokeMask = tirth.getDraw(ms_f(:,:,:,1));
-
-%% composition
-
-bkpixel = rimg(213,205,:);
-
-rimg2=rimg;
-rimg2=reshape(rimg2,[],3);
-
-rimg2(strokeMask,1)=bkpixel(1);
-rimg2(strokeMask,2)=bkpixel(2);
-rimg2(strokeMask,3)=bkpixel(3);
-
-rimg2=reshape(rimg2,size(rimg));
-
-fimshowpair(tirth.normalize(rimg),tirth.normalize(rimg2));
-
-%%
-comp=exp(log(rimg).*log(limg));
-comp2=real(comp); 
-comp2(comp2<0)=0;
-fimshowpair(ms_f(:,:,:,1), tirth.normalize(comp2) );
+rimg2=imread('../data/rimg_ta.png');
+rimg2=double(rimg2)./255;
+comp=rimg2+limg;
+fimshowpair(ms_f(:,:,:,1), comp );
 
 title('re-compose');
 
