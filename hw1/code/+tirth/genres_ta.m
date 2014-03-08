@@ -39,7 +39,7 @@ sid2 = [6,111,311,381,781,551,526,776,1356];
 
 sid2 = [196,1406,311];
 
-ratio = 1;
+ratio = 720/1080;
 
 ms_f = zeros( vHeight*ratio ,  vWidth*ratio , 3 , 0);
  
@@ -103,9 +103,7 @@ fimshowpair(ms_f(:,:,:,1), comp );
 title('re-compose');
 
 %% 
- 
-ratio=0.5;
-
+  
 vinFname = '../data/IMG_0549.MOV';
 voutFname ='../res/ta_comp_2_final.avi';
 
