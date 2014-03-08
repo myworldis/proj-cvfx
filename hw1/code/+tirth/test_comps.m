@@ -64,13 +64,14 @@ end
 
 %%
 
-targetImgs = smImgs;
+targetImgs_2 = smImgs;
 
 %%
 
-targetImgs=Weiss_intrinsic.zeroB(targetImgs,2);
-[rimg , limg , gimref , giml1 ]=tirth.rgbWeiss(targetImgs);
+targetImgs_zb=Weiss_intrinsic.zeroB(targetImgs_2,2);
+[rimg , limg , gimref , giml1 ]=tirth.rgbWeiss(targetImgs_zb);
 
+%%
 fimshow(tirth.normalize(rimg));
 title('reflectance');
 
@@ -85,12 +86,44 @@ fimshow(tirth.normalize(giml1));
 title('reflectance');
 
 %%
-comp=exp(log(rimg)+log(limg));
-comp2=real(comp); 
-comp2(comp2<0)=0;
-fimshowpair(targetImgs(:,:,:,1), tirth.normalize(comp2) );
 
+imwrite(rimg, 'rimg.png');
+
+%%
+
+
+%%
+% log domain
+comp=rimg+limg;
+
+comp(comp<0)=0;
+%fimshowpair(targetImgs(:,:,:,1), tirth.normalize(comp2) );
+fimshowpair(targetImgs(:,:,:,1), (comp) );
+
+fimshow(comp);
 title('re-comstruct');
+
+%% remove border
+
+
+comp2_rmb = comp(3:end-2,3:end-2,:); 
+fimshow( (comp2_rmb) );
+
+%% composed 
+
+rimg_ret=imread('../data/rimg.png');
+rimg_ret = double(rimg_ret)./255;
+comp=rimg_ret+limg;
+
+fimshowpair(targetImgs(:,:,:,1), (comp) );
+
+
+
+
+
+
+
+
 
 
 

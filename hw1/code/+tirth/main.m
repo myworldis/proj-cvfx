@@ -21,6 +21,8 @@ v1=VideoReader(fullfile(ROOT,f1) );
 
 num = v1.NumberOfFrames;
 
+VideoWriter
+
 %% load some data
 
 frames=zeros(v1.Height,v1.Width,3,0,'uint8');
@@ -156,7 +158,7 @@ rimg2=reshape(rimg2,size(rimg));
 fimshowpair(tirth.normalize(rimg),tirth.normalize(rimg2));
 
 %%
-comp=exp(log(rimg2)+log(limg));
+comp=exp(log(rimg).*log(limg));
 comp2=real(comp); 
 comp2(comp2<0)=0;
 fimshowpair(ms_f(:,:,:,1), tirth.normalize(comp2) );
