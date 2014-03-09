@@ -47,10 +47,10 @@ fprintf('# of frames = %d \n', size(targetImgs,4));
 [rimg , limg ,calData]=tirth.rgbWeiss(targetImgs);
 
 %%
-fimshow(tirth.normalize(rimg));
+fimshow(rimg);
 title('reflectance');
 
-fimshow(tirth.normalize(limg));
+fimshow(limg);
 title('light of frame 1');
  
 
@@ -58,9 +58,10 @@ title('light of frame 1');
 imwrite(rimg, '../data/rimg_our_1080p.png');
   
 %%
-% log domain
+% log domain -> so some value of light img would be negative
 comp=rimg+limg;
 
+comp(comp>1)=1;
 comp(comp<0)=0;
 %fimshowpair(targetImgs(:,:,:,1), tirth.normalize(comp2) );
 fimshowpair(targetImgs(:,:,:,1), (comp) );
@@ -72,6 +73,7 @@ title('re-comstruct');
 comp2_rmb = comp(3:end-2,3:end-2,:); 
 fimshow( (comp2_rmb) );
 
+
 %% composed 
 
 retouchRimg=imread('../data/rimg_our_rt_1080p.png');
@@ -82,20 +84,23 @@ retouchRimg2=imresize(retouchRimg,ratio);
 
 comp=retouchRimg2+limg;
 
-fimshowpair(targetImgs(:,:,:,1), (comp) );
+%fimshowpair(targetImgs(:,:,:,1), (comp) );
+fimshow(comp,'border','tight');
 title('recompose');
 
-%% 
+%% reconstruct ALL
  
 vinFname = '../data/new2/DSCN1213.MOV';
-voutFname ='../res/our_comp_final.MOV';
+voutFname ='../res/our_comp_impv1_final_cpr';
 
 vin=VideoReader( vinFname); 
-vout=VideoWriter( voutFname, 'Uncompressed AVI' ); 
+vout=VideoWriter( voutFname , 'MPEG-4');  
+
+rimgFname='../data/test_rt_new_our.png';
+rbkFname='../data/test_rt_bk_our.png';
 
 open(vout); 
-tirth.reconstrAll(vout,vin, retouchRimg2 ,calData , 0.5 );
- 
+tirth.reconstrAll_mat(vout,vin,rimg,rimgFname,rbkFname,calData , ratio);
 close(vout);
 
 %% save light of frame 1 and ref

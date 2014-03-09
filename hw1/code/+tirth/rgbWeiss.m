@@ -8,10 +8,7 @@ end
 
 verbase = false;
 
-
-if isa(rgbframes,'uint8')
-    rgbframes = double(rgbframes)./255;
-end
+ 
 
 % must do
 rgbframes=Weiss_intrinsic.zeroB(rgbframes,2);
@@ -35,6 +32,7 @@ ts = tic;
 [refImg(:,:,2),lightImg(:,:,2),calData.khat_rgb{end+1},calData.dx_rgb{end+1},calData.dy_rgb{end+1}]=calc(g_frs);
 [refImg(:,:,3),lightImg(:,:,3),calData.khat_rgb{end+1},calData.dx_rgb{end+1},calData.dy_rgb{end+1}]=calc(b_frs);
 toc(ts)
+
 
 %% gray version
 % 
