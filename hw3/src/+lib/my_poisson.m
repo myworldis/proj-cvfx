@@ -1,5 +1,6 @@
 function F = my_poisson( foreground, background, mask )
-
+%  foreground, background, mask
+%  
 
 if nargin < 3
     error('invalid');
@@ -54,22 +55,22 @@ b = zeros(n,1);   %
 b(bx) = background(bx); % fill constriant with BK(im2)
 
 % Compute Laplace Foreground
-lapforeground = circshift(foreground,[1 0])+circshift(foreground,[-1 0]);
-lapforeground = lapforeground+circshift(foreground,[0 1])+circshift(foreground,[0 -1]);
-lapforeground = lapforeground-4*foreground;
+lapFG = circshift(foreground,[1 0])+circshift(foreground,[-1 0]);
+lapFG = lapFG+circshift(foreground,[0 1])+circshift(foreground,[0 -1]);
+lapFG = lapFG-4*foreground;
 
-% lapBK = circshift(background,[1 0])+circshift(background,[-1 0]);
-% lapBK = lapBK+circshift(background,[0 1])+circshift(background,[0 -1]);
-% lapBK = lapBK-4*background;
-% 
-% gFor = imgradient(foreground);
-% gBK = imgradient(background);
-% 
-% resFB = lapforeground;
-% ch_flag= abs(gFor) < abs(gBK) ; 
-% resFB( ch_flag ) = lapBK(ch_flag);
+lapBK = circshift(background,[1 0])+circshift(background,[-1 0]);
+lapBK = lapBK+circshift(background,[0 1])+circshift(background,[0 -1]);
+lapBK = lapBK-4*background;
 
-resFB = lapforeground;
+gFor = imgradient(foreground);
+gBK = imgradient(background);
+
+resFB = lapFG;
+ch_flag= abs(lapFG) < abs(lapBK) ; 
+resFB( ch_flag ) = lapBK(ch_flag);
+
+%resFB = lapforeground;
 
 b(fx) = resFB(fx);
 % Solve Linear System Ax = b

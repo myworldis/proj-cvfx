@@ -9,13 +9,13 @@ im2=imread(fullfile(root,'monalisa.png'));
 im3=imread(fullfile(root,'mask.png'));
 
 
-im1=imread(fullfile(root,'2.jpg'));
-im2=imread(fullfile(root,'1.jpg'));
-im3=imread(fullfile(root,'mask_.jpg'));
+im1=imread(fullfile(root,'fg.jpg'));
+im2=imread(fullfile(root,'bg.jpg'));
+im3=imread(fullfile(root,'mask_our.png'));
 
 F=lib.poisson(im1,im2,im3);
 
-fimshowpair(im1,F);
+fimshowpair(im2,F);
 
 %% small test
 
@@ -48,10 +48,10 @@ fimshowpair(im3,F);
 
 %%
  
+% fg,bg,mask
 F=lib.my_poisson(im1,im2,im3);
 
-fimshowpair(im1,im2);
-fimshowpair(im3,F);
+fimshowpair(im2,F);
 
 
 
