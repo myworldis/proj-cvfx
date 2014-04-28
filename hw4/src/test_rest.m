@@ -7,8 +7,7 @@ addpath('../lib/GCMex');
 dataPath = '../data/';
  
 fg = imread( fullfile( dataPath , 'res_inp.jpg') );
-
-fg = double(fg)./255;
+ 
 
 fimshow(fg);
 
@@ -38,8 +37,10 @@ dataCost = ones( NUM_OF_UNK, NUM_OF_LABEL );
 % E( FG ) = BG
 
 for k=1:NUM_OF_LABEL
-    dataCost( :,k)= abs( double(fg(:)) - (k-1)/256 )  ;
+    dataCost( :,k)=  ( double(fg(:)) - (k-1) ).^2 ;
 end
+
+dataCost=dataCost*0.5;
 
 %% setup Pairwised cost
  
@@ -60,12 +61,12 @@ for i=1:numel(uu)
     pIdx = uu(i);
     qIdx = vv(i);
     
-    xi = norm( fg_1d(pIdx,:)- fg_1d(qIdx,:),1 ); 
+    xi = ( fg_1d(pIdx,:)- fg_1d(qIdx,:) ).^2*10 ; 
     weiNNG(pIdx,qIdx)=xi; 
 end
  
 disp('done');
-
+ 
 
 %% 
 
@@ -83,9 +84,14 @@ disp('done');
 % 
 % mmat= mmat+mmat';
 
-
 mmat = ones(NUM_OF_LABEL,NUM_OF_LABEL);
+
+lambda=2331;
+
 mmat(eye(NUM_OF_LABEL)>0)=0;
+
+mmat = mmat * lambda;
+
 %%
 % >> h = GCO_Create(4,3);             % Create new object with NumSites=4, NumLabels=3
 %      >> GCO_SetDataCost(h,[0 9 2 0;      % Sites 1,4 prefer  label 1
@@ -108,12 +114,12 @@ mmat(eye(NUM_OF_LABEL)>0)=0;
 h = GCO_Create(NUM_OF_UNK,NUM_OF_LABEL); 
 
 %  NumLabels-by-NumSites 
-GCO_SetDataCost(h, (dataCost*255)' );
+GCO_SetDataCost(h, (dataCost)' );
 
 
 GCO_SetSmoothCost(h, mmat );
 
-GCO_SetNeighbors(h,  (weiNNG*255) );
+GCO_SetNeighbors(h,  (nnG) );
 
 GCO_Expansion(h);   
 
@@ -123,7 +129,7 @@ disp( unique(ll) )
 
 %%
 
-ll2d=reshape(ll, size(fg));
+ll2d=reshape(ll-1, size(fg));
 
 ll2d = double(ll2d)/255;
   
