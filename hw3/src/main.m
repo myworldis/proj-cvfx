@@ -31,8 +31,6 @@ disp(m)
 % of array A.
 circshift(m,[0,2])
 
-
-
 %% 
 
 im1=imread(fullfile(root,'im1_32.png'));
@@ -44,8 +42,6 @@ F=lib.my_poisson(im1,im2,im3);
 fimshowpair(im1,im2);
 fimshowpair(im3,F);
 
-
-
 %%
  
 % fg,bg,mask
@@ -53,7 +49,68 @@ F=lib.my_poisson(im1,im2,im3);
 
 fimshowpair(im2,F);
 
+%% 
 
+vinPath=fullfile(root,'IMG_2027.MOV');
+vin=VideoReader(vinPath);
+
+voutPath = fullfile(root,'cup_s.avi');
+video_resize(vinPath,voutPath, 480/1080);
+
+%%
+
+vin=VideoReader(voutPath);
+num = vin.NumberOfFrames;
+
+fid=round(num*0.5);
+aframe =uint8(read(vin, fid)); 
+
+af=flipdim(aframe,1);
+af=flipdim(af,2);
+
+fimshow(af); 
+
+%%  
+%
+% 
+
+fg=imread('../data/cup_fg.png');
+bk=imread('../data/cup.png');
+mask=imread('../data/cup_mask.png');
+mask=mask(:,:,1);
+mask=~mask;
+F=lib.my_poisson(fg,bk,mask);
+fimshow(F);
+
+
+%%
+
+vpath = '../data/ccc/campus.avi';
+voutPath ='../data/ccc/tout_ori.avi';
+
+fg = imread('../data/ccc/fg_2.png');
+mask= imread('../data/ccc/mask3.png');
+mask=mask(:,:,1);
+
+fgflag = find(mask > 0);
+
+vinObj = VideoReader(vpath);
+voutObj = VideoWriter(voutPath);
+voutObj.open();
+num=vinObj.NumberOfFrames;
+presol=[];
+for k=1:vinObj.NumberOfFrames
+    bk=vinObj.read(k);
+    
+    F=lib.my_poisson(fg,bk,mask);
+    presol=F;
+    F(F>1)=1;
+    F(F<0)=0; 
+    writeVideo(voutObj, F); 
+    fprintf('proc %d/%d\n',k,num);
+end
+voutObj.close();
+disp('done');
 
 
 

@@ -1,9 +1,12 @@
-function F = my_poisson( foreground, background, mask )
+function F = my_poisson3d( foreground, background, mask , presol )
 %  foreground, background, mask
 %  
 
 if nargin < 3
     error('invalid');
+elseif nargin==3
+    F=[];
+    fprintf('diable frame blending');
 end
 
 if ndims(mask)==3
@@ -19,14 +22,14 @@ fprintf('start');
 
 ts=tic;
 F = zeros(size(background));
-F(:,:,1) = poisson_gray( background(:,:,1), foreground(:,:,1), mask );
-F(:,:,2) = poisson_gray( background(:,:,2), foreground(:,:,2), mask );
-F(:,:,3) = poisson_gray( background(:,:,3), foreground(:,:,3), mask );
+F(:,:,1) = poisson_gray( background(:,:,1), foreground(:,:,1), mask ,presol);
+F(:,:,2) = poisson_gray( background(:,:,2), foreground(:,:,2), mask ,presol);
+F(:,:,3) = poisson_gray( background(:,:,3), foreground(:,:,3), mask ,presol);
 
 toc(ts);
 end
 
-function F = poisson_gray( background, foreground, mask )
+function F = poisson_gray( background, foreground, mask , presol )
 
 [h,w] = size(foreground);
 
@@ -69,16 +72,35 @@ gBK = imgradient(background);
 resFB = lapFG;
 ch_flag= abs(lapFG) < abs(lapBK) ; 
 ch_flag= abs(gFor) < abs(gBK) ; 
+resFB( ch_flag ) = lapBK(ch_flag);
 
 %resFB = (lapBK+lapFG)/2;
-resFB( ch_flag ) = lapBK(ch_flag);
 
 %resFB = lapforeground;
 
 b(fx) = resFB(fx);
-% Solve Linear System Ax = b
-x = A\b;
-F = reshape(x,[h w]);
+
+if isempty(presol)
+    % Solve Linear System Ax = b
+    x = A\b;
+    F = reshape(x,[h w]);
+else
+    num_fg=length(fx);
+    presol_fg = presol(fx);
+    
+    b(end+1:end+num_fg)=presol_fg(:);
+    
+    effIdx = find(sum(I,2));
+    
+    cp_q = q;
+    cp_q(effIdx)=1;
+    
+    ii=sparse(1:length(effIdx),effIdx,ones(length(effIdx),1),length(effIdx),size(A,2));
+    A2=cat(1,A,ii);
+    x = A2\b;
+    F = reshape(x,[h w]);
+    
+end
 
 end
 
