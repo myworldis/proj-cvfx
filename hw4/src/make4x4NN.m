@@ -18,7 +18,12 @@ I_2d=zeros(FG_H,FG_W);
 % ignore border pixels
 I_2d(2:end-1,2:end-1)=1;
 
-I = sparse( diag(I_2d(:)) );
+LEN=numel(I_2d);
+%I = sparse( diag(I_2d(:)) );
+
+I = sparse(LEN,LEN);
+idx=sub2ind([LEN,LEN],1:LEN,1:LEN);
+I(idx)=I_2d(:);
 
 shift_h = FG_H;
 
