@@ -51,7 +51,6 @@ dataCost = ones( NUM_OF_UNK, NUM_OF_LABEL );
 fg_1=double(reshape(fg,[],3));
 bg_1=double(reshape(bg,[],3));
 
-
 fbgDiff = (fg_1 - bg_1);
 fbgDiff = bsxfun(@minus,fg_1,[15,20,32]);
 fbgDiff = sqrt(sum(fbgDiff.^2,2));
@@ -60,11 +59,10 @@ fbgDiff = sqrt(sum(fbgDiff.^2,2));
 %bgDiff = sqrt(sum(bgDiff.^2,2));
 
 dataCost( fg_mask1d,FG_LID)=0;
-dataCost(~fg_mask1d,FG_LID)=fbgDiff(~fg_mask1d,:);
+dataCost(~fg_mask1d,FG_LID)=mdist_1d;
 
-dataCost( fg_mask1d,BG_LID)=2000; 
-dataCost(~fg_mask1d,BG_LID)=0;
-
+dataCost( fg_mask1d,BG_LID)=200; 
+dataCost(~fg_mask1d,BG_LID)=200;
 
 iniLabel( ~fg_mask1d )=BG_LID;
 iniLabel( fg_mask1d )=FG_LID;
@@ -90,6 +88,7 @@ weiNNG = nnG;
 
 mask_dist=bwdist(fg_mask);
 mdist_1d = mask_dist(:);
+
 for i=1:numel(uu)
     
     pIdx = uu(i);
@@ -102,7 +101,7 @@ for i=1:numel(uu)
     y1 = norm( fg_dxy6d(pIdx,:)- fg_dxy6d(qIdx,:) ); 
     y2 = norm( bg_dxy6d(pIdx,:)- bg_dxy6d(qIdx,:) ); 
     
-    weiNNG(pIdx,qIdx)=mdist_1d(qIdx)+mdist_1d(pIdx)+(x1+x2);
+    weiNNG(pIdx,qIdx)=(x1+x2);
 end
 
 %% smooth 
@@ -138,12 +137,10 @@ h = GCO_Create(NUM_OF_UNK,NUM_OF_LABEL);
 
 GCO_SetDataCost(h, (dataCost') );
 
-GCO_SetSmoothCost(h, mmat );
+%GCO_SetSmoothCost(h, mmat );
 
 GCO_SetNeighbors(h, weiNNG );
-
-%GCO_SetLabeling(h,iniLabel);
-
+ 
 GCO_Expansion(h);   
 
 ll = GCO_GetLabeling(h);
@@ -163,7 +160,8 @@ figure;
 imagesc(final);
 axis image
 
-%%
+%%  
+fimshowpair(final,fg_mask );
 
 
 
