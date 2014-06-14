@@ -1,0 +1,6 @@
+
+
+
+1. create camera and setup key frame
+2. save video output
+3.
