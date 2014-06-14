@@ -17,6 +17,10 @@ classdef VideoProxy < handle
         
         function load(obj,fpath)
            
+            if ~exist(fpath,'file')
+                error(sprintf('File not existed [%s]\n',fullfile(pwd,fpath)));
+            end
+            
             obj.video_file = VideoReader(fpath); 
         end
          

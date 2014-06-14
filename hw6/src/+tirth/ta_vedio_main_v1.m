@@ -246,6 +246,47 @@ hold on;
 plot(m1_img(:,1),m1_img(:,2),'+');
 
 
+%%
+
+
+vin =fullfile(gdef.dataroot,'video','IMG_0834_480.avi');
+res_vin =fullfile(gdef.dataroot,'video','res.avi');
+
+ori=tirth.VideoProxy();
+ori.load(vin);
+res=tirth.VideoProxy();
+res.load(res_vin);
+
+assert(ori.totalFrame == res.totalFrame );
+
+vout = VideoWriter('vout.avi');
+vout.open();
+
+for k=1:res.totalFrame()
+    
+    fres = res.getFrame(k);
+    ores = ori.getFrame(k);
+    
+    comp=fres*0.5+ores*0.5;
+    vout.writeVideo(uint8(comp));
+end
+
+vout.close();
+
+disp('all done');
+
+%% handle 3d reconstruction
+
+vin =fullfile(gdef.dataroot,'video','IMG_0834_480.avi');
+
+ori=tirth.VideoProxy();
+ori.load(vin);
+
+f1 = ori.getFrame(1);
+
+imwrite(f1,'f1.png');
+
+
 
 
 
