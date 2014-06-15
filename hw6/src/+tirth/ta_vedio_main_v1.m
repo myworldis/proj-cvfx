@@ -199,19 +199,20 @@ plot(m1_img(:,1),m1_img(:,2),'+');
 %% compose debug video
 
 vin =fullfile(gdef.dataroot,'video','IMG_0834_480.avi');
-res_vin =fullfile(gdef.dataroot,'video','res.avi');
+res_vin =fullfile(gdef.dataroot,'res_pre.avi');
 
 ori=tirth.VideoProxy();
 ori.load(vin);
+
 res=tirth.VideoProxy();
 res.load(res_vin);
 
-assert(ori.totalFrame == res.totalFrame );
+total=min(ori.totalFrame , res.totalFrame );
 
 vout = VideoWriter('vout.avi');
 vout.open();
 
-for k=1:res.totalFrame()
+for k=1:total
     
     fres = res.getFrame(k);
     ores = ori.getFrame(k);
@@ -567,7 +568,7 @@ if 1
 end
 
 
-%%
+%% PY
 
 for k=1:numel(all_obb)
     
@@ -576,8 +577,7 @@ for k=1:numel(all_obb)
     fprintf('\n\n');
 end
 
-%%
-
+%% PY 
 
 for k=1:numel(all_wvex3d)
     
@@ -586,8 +586,12 @@ for k=1:numel(all_wvex3d)
     fprintf('\n\n');
 end
 
+ 
+%%
 
+res_pre = imread( fullfile(gdef.dataroot,'render.png'));
 
+fimshowpair(img_f,res_pre,'blend')
 
 
 
