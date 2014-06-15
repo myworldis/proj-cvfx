@@ -303,12 +303,11 @@ end
 
 disp('all done');
 
-
-
+ 
 %% debug depth
  
 
-%% 
+%% floor refit
 floor_pts=plpts_g{2};
 [FRes,inliers]=toolkit_g6_me.myRANSACFitPlane(floor_pts');
 
@@ -329,7 +328,7 @@ ck44=eye(4);
 ck44(1:3,1:3)=cK;
 
 invcam = inv(ck44*exttx);
-rep_pts3d=[];
+rep_pts3d=nan(size(refit_depth,1),size(refit_depth,2),3);
 
 for i=1:size(refit_depth,1)
     for j=1:size(refit_depth,2)
@@ -338,39 +337,133 @@ for i=1:size(refit_depth,1)
         
         if zval ~=0
            
-            p3=tirth.myim2world(j,i,zval,invcam);
-            
-            rep_pts3d=cat(1,rep_pts3d,p3);
+            p3=tirth.myim2world(j,i,zval,invcam); 
+            rep_pts3d(i,j,:)=p3;
             
         end
     end
 end
-disp('done'); 
+disp('rep_pts3d done'); 
 
 
 %% fit boxes
+
+
+theta=acos( dot([0,-1,0],fl_axis) );
+
+fr_axis = cross( [0,-1,0] , fl_axis );
+fr_mat = createRotation3dLineAngle([0,0,0,fr_axis(:)'],theta);
+
+fr_mat = fr_mat(1:3,1:3);
+fr_mat = fr_mat';
 
 all_obb={};
 for k=1:numel(obj_flag)
      
     obj_pts3d=eff_pts3d(obj_flag{k},:);
+     
     
     if k~=2 
         all_obb{k}=tirth.exbox(obj_pts3d,fl_axis,plane_model);
+        
     else
-        all_obb{k}=tirth.exbox(obj_pts3d,fl_axis,plane_model,0);
+        obj_pts3d =(fr_mat * obj_pts3d')';
+        
+        % knn filtering 
+
+        % k-by-N
+        dist=pdist2(obj_pts3d,obj_pts3d,'euclidean','Smallest',10);
+
+        % n-k
+        mdist=mean(dist',2);
+        th_dist=median(mdist);
+
+        goodFlag2 = mdist < th_dist;
+        obj_pts3d=obj_pts3d(goodFlag2,:);
+        
+        all_obb{k} = getBBoxByPts3(obj_pts3d);
+        all_obb{k} =(inv(fr_mat)*all_obb{k}')'; 
     end 
 end
 
-disp('all done');
+disp('fit boxes done');
+
+%% enforce on floor
+
+
+% floor fr mat
+rigi_yaxis = [0,-1,0];
+
+fl_axis= floor_model(1:3);
+fl_axis=fl_axis./norm(fl_axis);
+
+theta=acos( dot(rigi_yaxis,fl_axis) );
+fr_axis = cross(rigi_yaxis , fl_axis );
+fr_mat = createRotation3dLineAngle([0,0,0,fr_axis(:)'],theta);
+fr_mat = fr_mat(1:3,1:3);
+fr_mat = fr_mat';
+
+fr_mat44 = eye(4);
+fr_mat44(1:3,1:3)=fr_mat;
+fix_fl_model = floor_model(:)'*inv(fr_mat44);
+
+fix_fl_model = fix_fl_model ./ norm(fix_fl_model(1:3));
+
+for k=1:numel(all_obb)
+    
+    obb_k = all_obb{k};
+     
+    derr = pointPlaneDist(obb_k,floor_model);
+    
+    % take min 4
+    [sval,sidx]=sort(derr,'ascend');
+    
+    % enforce on plane
+    cl_vex = obb_k(sidx(1:4),:);
+    
+    % re-rot
+    % Nx4
+    cl_vex_fr = (fr_mat*cl_vex')';
+    % 4xN
+    cl_vex_fr = cl_vex_fr';
+    
+    L = [ fix_fl_model(:)'; 
+          [1,0,0,0]
+          [0,0,1,0]
+          [0,0,0,1]
+    ];
+    
+    b=zeros(4,size(cl_vex_fr,2));
+    
+    % b(1,:)=[ 0...]
+      b(2,:)=cl_vex_fr(1,:);% x
+      b(3,:)=cl_vex_fr(3,:);% z 
+      b(4,:)=ones(1,size(cl_vex_fr,2));
+      
+    % 4xN
+    sol = L \ b;
+    sol = sol';
+    sol = sol(:,1:3);
+     
+    sol_ori = (inv(fr_mat) * sol')';
+    
+    obb_k(sidx(1:4),:)=sol_ori;
+     
+    all_obb{k}=obb_k;
+    
+    %clear sol b L cl_vex_fr
+end
  
+disp('geo refine done');
 
 %% show all boxes
 
 figure;
 showPointCloud_gui(pts3d,pts3d(:,3));
 for k=1:numel(all_obb)
-    showBBox3D(all_obb{k});
+    if ~isempty(all_obb{k})
+        showBBox3D(all_obb{k});
+    end
 end
 
 %% extract plane vex
@@ -405,7 +498,7 @@ cam = cK44 * exttx;
 invcam = inv(cam);
 
 
-ext_ratio =10;
+ext_ratio =80;
 
 refit_depthmap=refit_depth;
 
@@ -420,41 +513,30 @@ for iw=1:numel(allw)
     for k=1:size(vex,1)
         wpts=vex(k,:);
         dep = refit_depthmap(wpts(2),wpts(1));
-        
         assert(dep~=0,'depth is zeros**');
         
-        xyz_im = [wpts(1)*dep , wpts(2)*dep , dep ,1];
+        %%xyz_im = [wpts(1)*dep , wpts(2)*dep , dep ,1];
         %xyz_im = [wpts(1) , wpts(2) , dep ,1];
            
-        pts3d_xyzw=(invcam*xyz_im')';
-        pts3d_xyzw=pts3d_xyzw./pts3d_xyzw(4);
+        %pts3d_xyzw=(invcam*xyz_im')';
+        %pts3d_xyzw=pts3d_xyzw./pts3d_xyzw(4);
         
-        dot(theta,pts3d_xyzw)
-
-        vex_3d=cat(1,vex_3d,pts3d_xyzw(1:3));
+        
+        p0 = rep_pts3d(wpts(2),wpts(1),:);
+        
+        vex_3d=cat(1,vex_3d, p0(:)' );
+        clear p0
     end
     
     %% enlarge plane
-    if 0
+    if 1
         c0 = mean(vex_3d);
-
-        theta=plane_model{iw};
-
-        plm = [ theta(:)';
-                1,0,0,0;
-                0,1,0,0;];
-
-        cx = plm \ [ [0];
-                     [c0(1)];
-                     [c0(2)];
-                   ];
-        cx=cx(1:3)';
-
+ 
         for iv=1:size(vex_3d,1)
-           dir = vex_3d(iv,:) - cx ;
+           dir = vex_3d(iv,:) - c0 ;
            dir_nv = dir ./ norm(dir);
 
-           vext = cx+dir ;%dir_nv*ext_ratio;
+           vext = c0 + dir + dir_nv*ext_ratio;
            vex_3d(iv,:)=vext;
         end
     
@@ -472,8 +554,15 @@ if 1
     showPointCloud_gui(pts3d,pts3d(:,3),'regularAxisOrder',true);
     
     for k=1:numel(all_wvex3d)
-        pp=all_wvex3d{k};hold on;
-        plot3(pp(:,1),pp(:,2),pp(:,3),'+','markersize',12,'linewidth',2);
+        pp=all_wvex3d{k};
+        
+        hold on;
+        %plot3(pp(:,1),pp(:,2),pp(:,3),'+','markersize',12,'linewidth',2);
+        plot3(pp(:,1),pp(:,2),pp(:,3),'linewidth',2);
+
+        c0=mean(pp);
+        hold on;
+        plot3(c0(:,1),c0(:,2),c0(:,3),'x','markersize',12,'linewidth',2);
     end
 end
 

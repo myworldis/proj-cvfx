@@ -13,7 +13,7 @@ eff_flag = false(size(rep2d,1),1);
 
 for k=1:size(rep2d,1)  
     
-    xy=round([rep2d(k,1),(k,2)]); 
+    xy=round([rep2d(k,1),rep2d(k,2)]); 
     
     if xy(1) > 0 && xy(1) < PW && xy(2) > 0 && xy(2) < PH 
        % valid point

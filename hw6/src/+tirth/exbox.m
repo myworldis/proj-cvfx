@@ -14,7 +14,7 @@ if useFilter
         good_flag=true(size(obj_pts3d,1),1);
         for i=1:numel(plane_model)
             err=error_plane(plane_model{i},obj_pts3d');
-            if nnz(err<1)
+            if nnz(err<0.2)
                 good_flag(err<1)=false;
             end
         end
