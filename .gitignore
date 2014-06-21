@@ -73,3 +73,6 @@ hw6/doc/*
 hw6/tool/*
 website/*
 hw6/bpy/*
+*.jpg
+*.avi
+*.png

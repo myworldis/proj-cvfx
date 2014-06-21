@@ -17,7 +17,18 @@ Rt_CAM_SAVDIR = fullfile(gdef.dataroot,'video','0834','sync_rt_txt');
 
 mkdir_if(Rt_CAM_SAVDIR);
 
-disp('done');
+%%
+% OUR
+%
+
+CAM_FPATH =fullfile(gdef.dataroot,'our','1671s_img\dense_fix\v1.nvm.cmvs\00\cameras_v2.txt');
+CAM_DIR =fullfile(gdef.dataroot,'our','1671s_img\dense_fix\v1.nvm.cmvs\00\txt'); 
+
+
+SYNC_CAM_DIR = fullfile(gdef.dataroot,'our\1671s_img\dense_fix','sync_camtxt');
+Rt_CAM_SAVDIR = fullfile(gdef.dataroot,'our\1671s_img\dense_fix','sync_rt_txt');
+
+mkdir_if(Rt_CAM_SAVDIR);
 
 
 %%
@@ -44,7 +55,7 @@ mstrs=cellfun(@(x)x{:},ef_str,'uniformoutput',false);
 
 [ cam_frame_ids ]=my_module.gt_tool.regNumFilter(mstrs);
 
-%% re saving BAT
+%% re saving COPY BAT
 
 [olist]=my_module.gt_tool.getPathList(CAM_DIR,'.txt');
 
@@ -61,7 +72,7 @@ sysbat=fopen('copy_.bat','w');
 
 for k=1:total_f
     % the fid of 
-    fid=k;
+    fid=sval(k);
     cam_fid = sidx(k)-1; 
     
     camFname = fullfile(CAM_DIR,sprintf('%.8d.txt',cam_fid ));
@@ -71,7 +82,7 @@ for k=1:total_f
 end
 fclose(sysbat);
 
-%% extract all R|Rt
+%% extract all SYNC_CAM_DIR
 
 
 clist = my_module.gt_tool.getPathList(SYNC_CAM_DIR,'.txt');
@@ -101,12 +112,12 @@ disp('done');
 
 %%
 fix_k=[
-893.533447266 0 427 
-0 893.533447266 240 
+933.82232666 0 1280 
+0 933.82232666 720
 0 0 1  
 ];
 
-
+%%
 % extract and save at Rt_CAM_SAVDIR
 % 
 for k=1:numel(allcam)
@@ -140,6 +151,8 @@ for k=1:numel(allcam)
 end
 
 disp('all done.');
+
+%%
 
 
 

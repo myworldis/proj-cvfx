@@ -47,7 +47,21 @@ end
     
     
     [local_pts,c0]=cenTx(inv(obb_basis),obj_pts3d);
-    aabb=getBBoxByPts3(local_pts);
+    
+    lpts = local_pts - repmat(c0,size(local_pts,1),1);
+    
+    max_v=max(lpts);
+    min_v=min(lpts);   
+    
+    max_v(1)=max_v(1)*0.7;
+    %min_v=min_v*0.8;
+    
+    max_v = max_v+c0;
+    min_v = min_v+c0;
+    
+    aabb=getBBoxByMaxMin(max_v,min_v);
+    
+    %aabb=getBBoxByPts3(local_pts);
     
     obb = cenTx(obb_basis,aabb,c0);
 end

@@ -25,27 +25,7 @@ fixK=[
 ];
 
 [cK , exttx , R , t ]=tirth.excamera_fix(allcam{fid},fixK);
-
-
-%% 
  
-% camera
-
-fix_coord=eye(4);
-fix_coord(1,1)=1;
-fix_coord(2,2)=-1;
-fix_coord(3,3)=-1;
-  
-final_Rt =  (exttx); 
-
-%  The first three elements specify the rotation axis, and the last element defines the angle of rotation.
-axisAngle = vrrotmat2vec(final_Rt(1:3,1:3));
-rAxis=axisAngle(1:3);
-rangle=axisAngle(4);
-
-tirth.printM(final_Rt);
-
-tirth.printM([rangle,rAxis]);
 
 %% load reconstructed point cloud
 
@@ -197,7 +177,7 @@ hold on;
 plot(m1_img(:,1),m1_img(:,2),'+');
 
 %% compose debug video
-
+if 0
 vin =fullfile(gdef.dataroot,'video','IMG_0834_480.avi');
 res_vin =fullfile(gdef.dataroot,'res_pre.avi');
 
@@ -224,7 +204,7 @@ end
 vout.close();
 
 disp('all done');
-
+end
 %% handle 3d reconstruction
 
 vin =fullfile(gdef.dataroot,'video','IMG_0834_480.avi');
@@ -303,10 +283,20 @@ for k=1:numel(pl_flag)
 end
 
 disp('all done');
+ 
+ %%
+figure;
+pp=pts3d;
+pp(:,2)=-1*pp(:,2);
+showPointCloud_gui(pp,pp(:,3));
 
- 
-%% debug depth
- 
+pp=plpts_g{1};
+pp(:,2)=-1*pp(:,2);
+showPointCloud_gui(pp(inlflag,:),pp(:,3));
+
+pp=plpts_g{3};
+pp(:,2)=-1*pp(:,2);
+showPointCloud_gui(pp(inlflag,:),pp(:,3));
 
 %% floor refit
 floor_pts=plpts_g{2};
@@ -317,9 +307,14 @@ fl_axis = floor_model(1:3);
 fl_axis = fl_axis ./ norm(fl_axis);
 
 
+%%
 figure;
-showPointCloud_gui(pts3d,pts3d(:,3));
-showPointCloud_gui(floor_pts,floor_pts(:,3));
+pp=pts3d;
+pp(:,2)=-1*pp(:,2);
+showPointCloud_gui(pp,pp(:,3));
+pp=floor_pts;
+pp(:,2)=-1*pp(:,2);
+showPointCloud_gui(pp,pp(:,3));
 
 disp('all done');
 
@@ -460,10 +455,16 @@ disp('geo refine done');
 %% show all boxes
 
 figure;
-showPointCloud_gui(pts3d,pts3d(:,3));
+
+dp=pts3d;
+dp(:,2)=-1*dp(:,2);
+
+showPointCloud_gui(dp,dp(:,3));
 for k=1:numel(all_obb)
     if ~isempty(all_obb{k})
-        showBBox3D(all_obb{k});
+        box=all_obb{k};
+        box(:,2)=-1*box(:,2);
+        showBBox3D(box);
     end
 end
 
@@ -568,7 +569,7 @@ if 1
 end
 
 
-%% PY
+%% PY box
 
 for k=1:numel(all_obb)
     
@@ -577,7 +578,7 @@ for k=1:numel(all_obb)
     fprintf('\n\n');
 end
 
-%% PY 
+%% PY plane
 
 for k=1:numel(all_wvex3d)
     
